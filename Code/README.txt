@@ -2,4 +2,4 @@ These folders go in:
 
 Root > .venv > XXXX
 
-of you PyCharm project
+of your PyCharm project

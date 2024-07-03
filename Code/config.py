@@ -6,11 +6,13 @@ DateTimeFormat = '%d-%m-%Y %H:%M'
 ValueCol = 1
 ValueColName = 'vibration (mm/s)'
 StatsFilePath = '../Data/Motor1VibratorStats.csv'
+ElbowFilePath = './KMeansElbow.png'
 GraphFilePath = './Vibration_Data_Set_Motor_Grouped.png'
 Decimal = 3
 std = 8.905
 avg = 21.5
 stdTreshold = 3
+maxKMeans = 10
 
 # Input: VAM_CT_Motor_1__vibration.csv
 # InputFile = '../Data/VAM_CT_Motor_1__vibration.csv'

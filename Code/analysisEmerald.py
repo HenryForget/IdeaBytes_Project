@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import statistics as stats
+from sklearn.cluster import KMeans
 from sklearn.ensemble import IsolationForest
 import Code.config as config
 class analysisEmerald:
@@ -204,3 +205,30 @@ class analysisEmerald:
         trendList = [b - a for a, b in zip(statsDF['Mean'][::1], statsDF['Mean'][1::1])]
         trendVal = "%.3f" % float(sum(trendList) / len(trendList))
         print("Your vibration is trending by an average of " + trendVal + " each day.")
+
+    def optimise_k_means(data, max_k, path):
+        '''
+        Function sourced from https://youtu.be/iNlZ3IU5Ffw?si=Xu5nMiMEwdU9vJoC
+
+        :param data:
+        :param max_k:
+        :return:
+        '''
+        means = []
+        inertias = []
+
+        for k in range(1, max_k):
+            kmeans = KMeans(n_clusters=k)
+            kmeans.fit(data)
+
+            means.append(k)
+            inertias.append(kmeans.inertia_)
+
+        # Generate the elbow plot
+        fig = plt.subplots(figsize=(10,5))
+        plt.plot(means, inertias, 'o-')
+        plt.xlabel('Number of Clusters')
+        plt.ylabel('Inertia')
+        plt.grid(True)
+        plt.savefig(path)
+        print('file created at: ' + str(path) + '\n')

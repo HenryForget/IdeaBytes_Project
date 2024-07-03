@@ -1,38 +1,31 @@
-import pandas as pd
-import matplotlib.pyplot as plt
+import analysisEmerald as analysis
+import config as config
 
+import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 
-# Function gotten from https://youtu.be/iNlZ3IU5Ffw?si=Xu5nMiMEwdU9vJoC
-def optimise_k_means(data, max_k):
-    means = []
-    inertias = []
+# Import Data
+vibedata = analysis.analysisEmerald.importer('../Data/Motor3Vibrator.csv', config.DateCol)
 
-    for k in range(1, max_k):
-        kmeans = KMeans(n_clusters=k)
-        kmeans.fit(data)
+## To be removed ##
+vibedata['index'] = range(0, len(vibedata))
+##               ##
 
-        means.append(k)
-        inertias.append(kmeans.inertia_)
+# convert all datetime values from String to datetime format and convert data values to float64 datatype
+analysis.analysisEmerald.colToDateTime(vibedata, config.DateCol, config.DateTimeFormat)
+analysis.analysisEmerald.colToFlt64(vibedata, config.ValueCol)
+# Divide the daily data
+vibedata_dividedDays = analysis.analysisEmerald.divideDays(vibedata, config.DateCol)
+# Creating elbow graph
+analysis.analysisEmerald.optimise_k_means(vibedata[[config.ValueColName]], config.maxKMeans,config.ElbowFilePath)
 
-    # Generate the elbow plot
-    fig = plt.subplots(figsize=(10,5))
-    plt.plot(means, inertias, 'o-')
-    plt.xlabel('Number of Clusters')
-    plt.ylabel('Inertia')
-    plt.grid(True)
-    plt.savefig('./KMeansElbow.png')
+### TODO: Make a multigraph ###
+for n in range(vibedata_dividedDays.__len__()):
+    kmeans = KMeans(n_clusters=3)
+    kmeans.fit(vibedata_dividedDays[n][['vibration (mm/s)']])
+    vibedata_dividedDays[n]['kmeans_3'] = kmeans.labels_
 
-
-df = pd.read_csv('../Data/Motor3Vibrator.csv', index_col='Date/Time')
-df['index'] = range(0, len(df))
-
-optimise_k_means(df[['vibration (mm/s)']], 10)
-
-kmeans = KMeans(n_clusters=3)
-kmeans.fit(df[['vibration (mm/s)']])
-df['kmeans_3'] = kmeans.labels_
-
-plt.clf()
-plt.scatter(y=df['vibration (mm/s)'], x=df['index'], c=df['kmeans_3'])
-plt.savefig('./KMeans3.png')
+    plt.clf()
+    plt.ylim(0, None) # Never going to be negatice vibration
+    plt.scatter(y=vibedata_dividedDays[n]['vibration (mm/s)'], x=vibedata_dividedDays[n]['index'], c=vibedata_dividedDays[n]['kmeans_3'])
+    plt.savefig('./KMeans/KMeans' + str(n) + '.png')
