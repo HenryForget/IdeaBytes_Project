@@ -165,24 +165,23 @@ class analysisEmerald:
         :param df: dataframe
         :param valueColName: name of the column that holds the values
         '''
-        std = 0
-        avg = 0
+        std = config.std
+        avg = config.avg
         # add index
         df['index'] = range(0, len(df))
 
         for n in range(df.__len__()):
             # Each new instance after 0
             if n >= 1:
-                std = stats.stdev(df[valueColName][0:n+1], avg)
+                # std = stats.stdev(df[valueColName][0:n+1], avg)
                 # n's value is checked, if they are 3 standard deviations away from the current average
-                if (df[valueColName][n] > avg+abs(std*config.std)) | (df[valueColName][n] < avg-abs(std*config.std)):
+                if (df[valueColName][n] > avg+abs(std*config.stdTreshold)) | (df[valueColName][n] < avg-abs(std*config.stdTreshold)):
                     #  Print unexpected vibration
                     print('Anomolous vibration: instance ' + str(n))
-                avg = df[valueColName].mean()
-                if n % 1000 == 0:
-                    print(str(n) + ' done...')
+                # avg = df[valueColName].mean()
             else:
                 avg = df[valueColName][n]
+
         print("Final avg: " + str(avg) + "  Final std: " + str(std))
 
     def vibrationStats(df, valueCol, path):
