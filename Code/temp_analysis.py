@@ -38,7 +38,11 @@ class TempAnalysis():
         self.data = self.data.join(one_hot)
         self.data[self.data.columns[1]] = self.data[self.data.columns[1]].astype(int)
         # find and fill in missing values with forward fill
-        self.data = self.data.resample(rule=self.data_freq).ffill()
+        # self.data = self.data.resample(rule=self.data_freq).ffill()
+        self.data = self.data.asfreq(freq = self.data_freq)
+        # pchip, nearest ok
+        self.data[self.data.columns[0]] = self.data[self.data.columns[0]].interpolate('pchip')
+        self.data[self.data.columns[1]] = self.data[self.data.columns[1]].ffill()
 
     def calculate_kpss(self):
         ''' Test if the series is stationary using KPSS method'''
@@ -115,7 +119,7 @@ class TempAnalysis():
         #  upload data
         # self.ext_data = pd.read_csv(datapath)
 
-    def _calculate_corr(self):
+    def calculate_corr(self):
         '''Calcualtes a correlation between equipment data and external data'''
 
     def get_dataset(self):
