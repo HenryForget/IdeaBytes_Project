@@ -33,11 +33,10 @@ class TempAnalysis():
         self.data = self.data.sort_index()
         # find and fill in missing values with forward fill
         self.data = self.data.resample(rule=self.data_freq).ffill()
-        self.data.to_csv('./with missing.csv')
 
     def calculate_kpss(self):
         ''' Test if the series is stationary using KPSS method'''
-        values = self.data[self.data.columns[1]]
+        values = self.data[self.data.columns[0]]
         print("KPSS test:")
         kpss_test = kpss(values, regression='ct')
         kpss_result = pd.Series(kpss_test[0:3], index=['Test Statistic','p-value','Lags Used'])
@@ -52,7 +51,7 @@ class TempAnalysis():
 
     def calculate_adf(self):
         ''' Test if the series is stationary using ADF method '''
-        values = self.data[self.data.columns[1]]
+        values = self.data[self.data.columns[0]]
         print("ADF test:")
         # get the results of ADF on temperature set
         df_test = adfuller(values, autolag='AIC')
@@ -108,12 +107,9 @@ class TempAnalysis():
     def analyze_ext_data(self, datapath, ext_index):
         '''Plots and analyzes external dataset (i.e. city temp)'''
         #  upload data
-        self.ext_data = pd.read_csv(datapath)
-        # prepare data
-        # self.ext_data = self.prepare_data(data)
-        # plot data: the whole period and daily
-        self.plot_general(self.ext_data)
-        self.plot_daily(self.ext_data)
+        # self.ext_data = pd.read_csv(datapath)
+        
+
 
     def _calculate_corr(self):
         '''Calcualtes a correlation between equipment data and external data'''
