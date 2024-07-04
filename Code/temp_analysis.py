@@ -7,8 +7,9 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 class TempAnalysis():
-    ''' Initialize object '''
+    ''' Temperature analysis '''
     def __init__(self, datapath, configpath) -> None:
+        ''' Initialize object '''
         config = configparser.ConfigParser()
         config.read(configpath)
         self.sign_level = float(config.get('MAIN','SIGN_LEVEL'))
@@ -16,7 +17,7 @@ class TempAnalysis():
         self.date_format = config.get('MAIN','DATE_FORMAT')
         self.data_freq = config.get('MAIN','DATA_FREQ')
         self.index = config.get('MAIN','INDEX')
-        self.data = pd.read_csv(datapath, index_col=[self.index], 
+        self.data = pd.read_csv(datapath, index_col=[self.index],
                                 parse_dates=[self.index], date_format=self.date_format)
         self.ext_data = None
         print(f"Total instances: {len(self.data)}")
@@ -31,6 +32,11 @@ class TempAnalysis():
         self.data[self.data.columns[0]] = self.data[self.data.columns[0]].astype(float)
         #  sort dataset by the first column
         self.data = self.data.sort_index()
+        # convert catigorical to numerical for non numeric data
+        one_hot = pd.get_dummies(self.data[self.data.columns[1]], drop_first=True)
+        self.data = self.data.drop(self.data.columns[1], axis=1)
+        self.data = self.data.join(one_hot)
+        self.data[self.data.columns[1]] = self.data[self.data.columns[1]].astype(int)
         # find and fill in missing values with forward fill
         self.data = self.data.resample(rule=self.data_freq).ffill()
 
@@ -108,8 +114,11 @@ class TempAnalysis():
         '''Plots and analyzes external dataset (i.e. city temp)'''
         #  upload data
         # self.ext_data = pd.read_csv(datapath)
-        
-
 
     def _calculate_corr(self):
         '''Calcualtes a correlation between equipment data and external data'''
+
+    def get_dataset(self):
+        '''Returns the prepared dataset'''
+        self.prepare_data()
+        return self.data
