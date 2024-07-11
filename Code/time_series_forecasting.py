@@ -7,6 +7,8 @@ from pandas.plotting import autocorrelation_plot
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 from math import sqrt
+import time
+
 class TsForecasting():
     '''Utility class for prediction models'''
     def __init__(self, dataset, graph_dir):
@@ -59,18 +61,27 @@ class TsForecasting():
         '''Uses ARIMA model for predictions
          - no exogenous regressors used
          - no seasonal component'''
-        # train-test sets: 70/30
-        size = int(len(self.data)*0.7)
+        # train-test sets: 90/10
+        size = int(len(self.data)*0.9)
         train_set, test_set = self.data[0:size], self.data[size:len(self.data)]
         forecast_set = list()
-        for i in range(len(self.data)):
-            model = ARIMA(endog=train_set[train_set.columns[0]],order=(1,1,1))
+        train_rolling = [x for x in train_set[train_set.columns[0]]]
+        start = time.time()
+        for i in range(len(test_set)):
+            model = ARIMA(endog=train_rolling, order=(1,1,1))
             model_fit = model.fit()
-            # forecast method takes forever, use predict instead 
+            # rolling forecast method takes forever, use predict instead?
             forecast = model_fit.forecast()
-            forecast_set.append(forecast)
-        self.plot_forecast(test_set, forecast_set, 'ARIMA')
+            forecast_set.append(forecast[0])
+            train_rolling.append(test_set[test_set.columns[0]].iloc[i])
+            print(f'Iteration {i}: Predicted {forecast[0]}, \
+                  Expected {test_set[test_set.columns[0]].iloc[i]}')
+        end = time.time()
+        print(f'Rolling forecast execution time for len{test_set} test instances: \
+              {start-end} seconds.')
+        # self.plot_forecast(test_set, forecast_set, 'ARIMA')
         print(model_fit.summary())
+        print(self.calculate_rmse(test_set, forecast_set))
 
     def run_prophet(data):
         '''Uses Prophet model for predictions'''
