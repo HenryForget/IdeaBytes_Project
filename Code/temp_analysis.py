@@ -17,6 +17,7 @@ class TempAnalysis():
         self.date_format = config.get('MAIN','DATE_FORMAT')
         self.data_freq = config.get('MAIN','DATA_FREQ')
         self.index = config.get('MAIN','INDEX')
+        self.statuses = int(config.get('MAIN','STATUS_COL'))
         self.data = pd.read_csv(datapath, index_col=[self.index],
                                 parse_dates=[self.index], date_format=self.date_format)
         self.ext_data = None
@@ -76,6 +77,10 @@ class TempAnalysis():
             return True
         return False
 
+    def get_stats(self):
+        '''Returns descriptive statistics for timeseries values'''
+        return self.data.describe(include='all')
+
     def plot_general(self, name, data = None):
         '''Plots the data for the period'''
         plt.figure(figsize=(60, 46))
@@ -87,18 +92,35 @@ class TempAnalysis():
         plt.xticks(rotation=35)
         plt.savefig(f'{"/".join([self.graphs_dir,name])}.png')
 
+    def plot_comp_status(self, name):
+        '''Plots additional axis for compressor/evaporator/defroster status'''
+        colors = ['blue','red','green','black','yellow']
+        fig, ax1 = plt.subplots()
+        ax1.plot(self.data.index,self.data[self.data.columns[0]], color=colors[0])
+        for i in range(0,self.statuses):
+            ax2 = ax1.twinx()
+            ax2.set_ylabel(self.data.columns[i+1], color=colors[i+1])
+            ax2.plot(self.data.index,self.data[self.data.columns[i+1]], color=colors[i+1])
+        fig.tight_layout()
+        fig.set_size_inches(200, 250)
+        fig.savefig(f'{"/".join([self.graphs_dir,name])}.png')
+
+
     def plot_util(self,  x_axis, y_axis, ax):
         ''' Utility function for plotting everyday data'''
+        colors = ['blue','red','green','black','yellow']
         ax.set_title(x_axis[0].strftime('%Y-%m-%d'))
         ax.set_xlim(x_axis[0], x_axis[-1])
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
         ax.plot(x_axis, y_axis)
+        for i in range(0,self.statuses):
+            ax2 = ax.twinx()
+            ax2.set_ylabel(self.data.columns[i+1], color=colors[i+1])
+            ax2.plot(self.data.index,self.data[self.data.columns[i+1]], color=colors[i+1])
 
-    def plot_daily(self, name, data = None):
+    def plot_daily(self, name):
         '''Plots the data with daily breakdown'''
-        if not data:
-            data = self.data
-        days_data = [group for n, group in data.groupby(pd.Grouper(freq='D'))]
+        days_data = [group for n, group in self.data.groupby(pd.Grouper(freq='D'))]
         plot_cols = 6
         plot_rows = (int)(len(days_data)/plot_cols)
         fig, ax = plt.subplots(plot_rows+1,plot_cols, sharey=True)
@@ -116,7 +138,7 @@ class TempAnalysis():
 
     def analyze_ext_data(self, datapath, ext_index):
         '''Plots and analyzes external dataset (i.e. city temp)'''
-        #  upload data
+        #  upload data - use Australia
         # self.ext_data = pd.read_csv(datapath)
 
     def calculate_corr(self):
