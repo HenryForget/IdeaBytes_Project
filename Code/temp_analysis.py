@@ -38,12 +38,11 @@ class TempAnalysis():
         self.data = self.data.drop(self.data.columns[1], axis=1)
         self.data = self.data.join(one_hot)
         self.data[self.data.columns[1]] = self.data[self.data.columns[1]].astype(int)
-        # find and fill in missing values with forward fill
-        # self.data = self.data.resample(rule=self.data_freq).ffill()
-        self.data = self.data.asfreq(freq = self.data_freq)
-        # pchip, nearest ok
-        self.data[self.data.columns[0]] = self.data[self.data.columns[0]].interpolate('pchip')
-        self.data[self.data.columns[1]] = self.data[self.data.columns[1]].ffill()
+        # resample dataset - will fill the missing values as null
+        # self.data = self.data.asfreq(freq = self.data_freq)
+        # pchip for interpolation
+        # self.data[self.data.columns[0]] = self.data[self.data.columns[0]].interpolate('pchip')
+        # self.data[self.data.columns[1]] = self.data[self.data.columns[1]].ffill()
 
     def calculate_kpss(self):
         ''' Test if the series is stationary using KPSS method'''
