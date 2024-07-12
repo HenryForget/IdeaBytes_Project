@@ -2,7 +2,7 @@
 # from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.stattools import acf, pacf
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
 from pandas.plotting import autocorrelation_plot
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
@@ -41,17 +41,10 @@ class TsForecasting():
 
     def plot_forecast(self, test, predict, name):
         '''Plots results of temperature prediction'''
-        print(test)
-        print(predict)
-        # fig, ax = plt.subplots()
-        # ax.set_label('Test Set')
-        # ax.plot(test.index,test[test.columns[0]], color='grey')
-        # ax1 = ax.twinx()
-        # ax1.set_label("Prediction")
-        # ax1.plot(predict.index,predict[predict.columns[0]], color='green')
-        # fig.tight_layout()
-        # fig.set_size_inches(100, 150)
-        # fig.savefig(f'{"/".join([self.graph_dir,name])}.png')
+        plt.figure(figsize = (50, 35))
+        plt.plot(test.index,test[test.columns[0]], color='grey', label= 'Test Set')
+        plt.plot(test.index,predict, color='blue', label = 'Prediction')
+        plt.savefig(f'{"/".join([self.graph_dir,name])}.png')
 
     def calculate_rmse(self, test, predict):
         '''Returns root squared mean error value'''
@@ -59,29 +52,24 @@ class TsForecasting():
 
     def run_arima(self):
         '''Uses ARIMA model for predictions
-         - no exogenous regressors used
-         - no seasonal component'''
-        # train-test sets: 90/10
-        size = int(len(self.data)*0.9)
+         - no seasonal component
+         - p=, d=, q='''
+        # train-test sets: 85/15
+        size = int(len(self.data)*0.85)
         train_set, test_set = self.data[0:size], self.data[size:len(self.data)]
-        forecast_set = list()
-        train_rolling = [x for x in train_set[train_set.columns[0]]]
         start = time.time()
-        for i in range(len(test_set)):
-            model = ARIMA(endog=train_rolling, order=(1,1,1))
-            model_fit = model.fit()
-            # rolling forecast method takes forever, use predict instead?
-            forecast = model_fit.forecast()
-            forecast_set.append(forecast[0])
-            train_rolling.append(test_set[test_set.columns[0]].iloc[i])
-            print(f'Iteration {i}: Predicted {forecast[0]}, \
-                  Expected {test_set[test_set.columns[0]].iloc[i]}')
+        # don't interpolate missing values in data preparation, take dataset as it is and use missing 
+        # parameter to drop from the training
+        model = ARIMA(endog=train_set[train_set.columns[0]], order=(1,0,2), exog=train_set[train_set.columns[1]])
+        model_fit = model.fit()
         end = time.time()
-        print(f'Rolling forecast execution time for len{test_set} test instances: \
-              {start-end} seconds.')
-        # self.plot_forecast(test_set, forecast_set, 'ARIMA')
+        forecast_set = model_fit.predict(start=len(train_set), end=len(self.data)-1, exog=test_set[test_set.columns[1]], missing='drop' )
+        print(f'ARIMA training time for {len(test_set)} test instances: \
+              {end-start} seconds.')
+        self.plot_forecast(test_set, forecast_set, 'ARIMA')
         print(model_fit.summary())
-        print(self.calculate_rmse(test_set, forecast_set))
+        forecast_set.to_csv('./forecast.csv')
+        print(f'Root Mean Squared Error: {self.calculate_rmse(test_set[test_set.columns[0]], forecast_set)}')
 
     def run_prophet(data):
         '''Uses Prophet model for predictions'''
