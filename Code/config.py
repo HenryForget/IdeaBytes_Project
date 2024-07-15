@@ -11,7 +11,7 @@ GraphFilePath = './Vibration_Data_Set_Motor_Grouped.png'
 Decimal = 3
 std = 8.905
 avg = 21.5
-stdTreshold = 3
+stdTreshold = 2
 maxKMeans = 10
 
 # Input: VAM_CT_Motor_1__vibration.csv

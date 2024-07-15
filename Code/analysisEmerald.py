@@ -135,7 +135,7 @@ class analysisEmerald:
 
         print("Plotting...")
         fig.set_size_inches(config.plotDaysFigWidth, config.plotDaysFigHeight)
-        fig.savefig(path)
+        # fig.savefig(path)
         print('file created at: ' + str(path) + '\n')
 
     def plotIsolationForest(df, colorGood, colorBad, contamination, path):
@@ -168,22 +168,17 @@ class analysisEmerald:
         '''
         std = config.std
         avg = config.avg
-        # add index
-        df['index'] = range(0, len(df))
+        # add anomaly column
+        df['anomaly'] = 0
 
         for n in range(df.__len__()):
-            # Each new instance after 0
-            if n >= 1:
-                # std = stats.stdev(df[valueColName][0:n+1], avg)
-                # n's value is checked, if they are 3 standard deviations away from the current average
-                if (df[valueColName][n] > avg+abs(std*config.stdTreshold)) | (df[valueColName][n] < avg-abs(std*config.stdTreshold)):
-                    #  Print unexpected vibration
-                    print('Anomolous vibration: instance ' + str(n))
-                # avg = df[valueColName].mean()
-            else:
-                avg = df[valueColName][n]
+            # n's value is checked, if they are X standard deviations away from the average
+            if (df[valueColName][n] > avg+abs(std*config.stdTreshold)) | (df[valueColName][n] < avg-abs(std*config.stdTreshold)):
+                #  Print flag unexpected vibration
+                df.loc[n, 'anomaly'] = 1
 
         print("Final avg: " + str(avg) + "  Final std: " + str(std))
+        return df
 
     def vibrationStats(df, valueCol, path):
         '''

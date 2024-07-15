@@ -1,5 +1,6 @@
 import Code.analysisEmerald as analysis
 import Code.config as config
+import plotly.express as px
 
 # import vibration data into pandas dataframe
 vibedata_sorted = analysis.analysisEmerald.importer(config.InputFile, config.DateCol)
@@ -15,6 +16,9 @@ vibedata_dividedDays = analysis.analysisEmerald.divideDays(vibedata_cleaned, con
 analysis.analysisEmerald.vibrationStats(vibedata_dividedDays, config.ValueColName, config.StatsFilePath)
 # Print daily data as pdf
 analysis.analysisEmerald.plotDaysDataframesPDF(vibedata_dividedDays, 7, config.GraphFilePath)
-
 # check data for predictions
-analysis.analysisEmerald.predictData(vibedata_cleaned, config.ValueColName)
+vibedata_predictions = analysis.analysisEmerald.predictData(vibedata_cleaned, config.ValueColName)
+
+vibedata_predictions.to_csv('out.csv', index=False)
+fig = px.scatter(x=vibedata_predictions['Date/Time'], y=vibedata_predictions['vibration (mm/s)'], color=vibedata_predictions['anomaly'])
+fig.write_image('./pltcolor.png')
