@@ -25,6 +25,12 @@ maxKMeans = 10
 # Decimal = 3
 # std = 3
 
+# Kmeans graphing -----------------------------
+kMeansNumClusters = 4
+kMeansPlotFigWidth = 10
+kMeansPlotFigHeight = 300
+# ---------------------------------------------
+
 
 # analysisEmerald
 # plotLine()

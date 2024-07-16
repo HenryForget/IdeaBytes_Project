@@ -165,6 +165,7 @@ class analysisEmerald:
         Scan existing data and come up with predictions on the next item
         :param df: dataframe
         :param valueColName: name of the column that holds the values
+        :return: df: The dataframe
         '''
         std = config.std
         avg = config.avg
@@ -227,3 +228,14 @@ class analysisEmerald:
         plt.grid(True)
         plt.savefig(path)
         print('file created at: ' + str(path) + '\n')
+
+    def closest(lst, K):
+        '''
+
+        :param lst:
+        :param K:
+        :return:
+        '''
+        lst = np.asarray(lst)
+        idx = (np.abs(lst - K)).argmin()
+        return idx
