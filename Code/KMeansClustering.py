@@ -1,5 +1,6 @@
 import analysisEmerald as analysis
 import config as config
+import math
 
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
@@ -41,20 +42,33 @@ vibedata_dividedDays = analysis.analysisEmerald.divideDays(vibedata, config.Date
 analysis.analysisEmerald.vibrationStats(vibedata_dividedDays, config.ValueColName, config.StatsFilePath)
 
 # Create figure and subplots
-fig,ax = plt.subplots(vibedata_dividedDays.__len__(),1,sharey=True)
+fig,ax = plt.subplots(math.ceil(vibedata_dividedDays.__len__()/config.kMeansNumCols),config.kMeansNumCols,sharey=True)
+figX = 0
+figY = 0
 
 for n in range(vibedata_dividedDays.__len__()):
+
      # Add scatter plot to figure
-     ax[n].scatter(y=vibedata_dividedDays[n]['vibration (mm/s)'], x=vibedata_dividedDays[n]['index'], c=vibedata_dividedDays[n]['kmeans_3'], cmap=cmap)
-     ax[n].set_title("Day" + str(n+1))
+     ax[figY][figX].scatter(y=vibedata_dividedDays[n]['vibration (mm/s)'], x=vibedata_dividedDays[n]['index'], c=vibedata_dividedDays[n]['kmeans_3'], cmap=cmap)
+     # Set title and axis labels
+     ax[figY][figX].set_title("Day " + str(n+1))
+     ax[figY][figX].set_xlabel("Data Point")
+     ax[figY][figX].set_ylabel("Vibration (mm/s)")
+
+     # Get row/col position
+     if (n + 1) % config.kMeansNumCols == 0:
+          figY += 1
+          figX = 0
+     else:
+          figX += 1
 
 # Set figure size and save
-fig.set_size_inches(config.kMeansPlotFigWidth,config.kMeansPlotFigHeight)
+fig.set_size_inches(config.kMeansPlotFigWidth * config.kMeansNumCols,config.kMeansPlotFigHeight * (n/config.kMeansNumCols))
 fig.tight_layout()
 fig.savefig('./KMeans/KMeans' + 'OneFig' + '.png')
 
-
+### TODO: Move to analysisEmerals as function
 # Print the number of anomalies per day and change below to export to a CSV
-for n in range(vibedata.__len__()):
-     if vibedata.loc[n]['kmeans_3'] == anomaly:
-          print('Anomaly: ' + str(vibedata.loc[n]['Date/Time']) + '  ' + str(vibedata.loc[n]['vibration (mm/s)']))
+#for n in range(vibedata.__len__()):
+#     if vibedata.loc[n]['kmeans_3'] == anomaly:
+#          print('Anomaly: ' + str(vibedata.loc[n]['Date/Time']) + '  ' + str(vibedata.loc[n]['vibration (mm/s)']))
