@@ -8,7 +8,7 @@ from sklearn.ensemble import IsolationForest
 import Code.config as config
 class analysisEmerald:
     '''
-    Reusable methods for data preperation and cleaning
+    Reusable methods for data preparation and cleaning
     '''
 
     def importer(path, sortCol):
@@ -176,7 +176,7 @@ class analysisEmerald:
             if n >= 1:
                 # std = stats.stdev(df[valueColName][0:n+1], avg)
                 # n's value is checked, if they are 3 standard deviations away from the current average
-                if (df[valueColName][n] > avg+abs(std*config.stdTreshold)) | (df[valueColName][n] < avg-abs(std*config.stdTreshold)):
+                if (df[valueColName][n] > avg+abs(std*config.stdThreshold)) | (df[valueColName][n] < avg - abs(std * config.stdThreshold)):
                     #  Print unexpected vibration
                     print('Anomolous vibration: instance ' + str(n))
                 # avg = df[valueColName].mean()

@@ -19,13 +19,19 @@ vibedata_dividedDays = analysis.analysisEmerald.divideDays(vibedata, config.Date
 # Creating elbow graph
 analysis.analysisEmerald.optimise_k_means(vibedata[[config.ValueColName]], config.maxKMeans,config.ElbowFilePath)
 
-### TODO: Make a multigraph ###
+# Create figure and subplots
+fig,ax = plt.subplots(8,1,sharey=True)
+
 for n in range(vibedata_dividedDays.__len__()):
     kmeans = KMeans(n_clusters=config.kMeansNumClusters)
     kmeans.fit(vibedata_dividedDays[n][['vibration (mm/s)']])
     vibedata_dividedDays[n]['kmeans_3'] = kmeans.labels_
 
-    plt.clf()
-    plt.ylim(0, None) # Never going to be negatice vibration
-    plt.scatter(y=vibedata_dividedDays[n]['vibration (mm/s)'], x=vibedata_dividedDays[n]['index'], c=vibedata_dividedDays[n]['kmeans_3'])
-    plt.savefig('./KMeans/KMeans' + str(n) + '.png')
+    # Add scatter plot to figure
+    ax[n].scatter(y=vibedata_dividedDays[n]['vibration (mm/s)'], x=vibedata_dividedDays[n]['index'], c=vibedata_dividedDays[n]['kmeans_3'])
+    ax[n].set_title("Day" + str(n+1))
+
+# Set figure size and save
+fig.set_size_inches(config.kMeansPlotFigWidth,config.kMeansPlotFigHeight)
+fig.tight_layout()
+fig.savefig('./KMeans/KMeans' + 'OneFig' + '.png')

@@ -11,7 +11,7 @@ GraphFilePath = './Vibration_Data_Set_Motor_Grouped.png'
 Decimal = 3
 std = 8.905
 avg = 21.5
-stdTreshold = 3
+stdThreshold = 3
 maxKMeans = 10
 
 # Input: VAM_CT_Motor_1__vibration.csv
@@ -27,8 +27,8 @@ maxKMeans = 10
 
 # Kmeans graphing -----------------------------
 kMeansNumClusters = 3
-kMeansPlotFigWidth = 100
-kMeansPlotFigHeight = 150
+kMeansPlotFigWidth = 10
+kMeansPlotFigHeight = 15
 # ---------------------------------------------
 
 # analysisEmerald
