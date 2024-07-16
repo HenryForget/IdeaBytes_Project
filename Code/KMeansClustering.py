@@ -21,7 +21,7 @@ analysis.analysisEmerald.optimise_k_means(vibedata[[config.ValueColName]], confi
 
 ### TODO: Make a multigraph ###
 for n in range(vibedata_dividedDays.__len__()):
-    kmeans = KMeans(n_clusters=3)
+    kmeans = KMeans(n_clusters=config.kMeansNumClusters)
     kmeans.fit(vibedata_dividedDays[n][['vibration (mm/s)']])
     vibedata_dividedDays[n]['kmeans_3'] = kmeans.labels_
 
