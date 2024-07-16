@@ -27,8 +27,9 @@ maxKMeans = 10
 
 # Kmeans graphing -----------------------------
 kMeansNumClusters = 4
-kMeansPlotFigWidth = 10
-kMeansPlotFigHeight = 300
+kMeansNumCols = 2
+kMeansPlotFigWidth = 10 # Width for only one sub-figure
+kMeansPlotFigHeight = 5 # Height for only one sub-figure
 # ---------------------------------------------
 
 
