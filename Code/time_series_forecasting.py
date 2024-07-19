@@ -2,7 +2,13 @@
 # from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.stattools import acf, pacf
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from prophet import Prophet
+from prophet.plot import (plot_plotly,
+plot_components_plotly,
+plot_forecast_component_plotly,
+plot_seasonality_plotly)
 from pandas.plotting import autocorrelation_plot
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
@@ -15,6 +21,9 @@ class TsForecasting():
         '''Create the object'''
         self.data = dataset
         self.graph_dir = graph_dir
+        # train-test sets:70/30
+        size = int(len(self.data)*0.70)
+        self.train_set, self.test_set = self.data[0:size], self.data[size:len(self.data)]
 
     def get_acf(self):
         '''Calculate ACF'''
@@ -53,26 +62,65 @@ class TsForecasting():
     def run_arima(self):
         '''Uses ARIMA model for predictions
          - no seasonal component
-         - p=, d=, q='''
-        # train-test sets: 85/15
-        size = int(len(self.data)*0.85)
-        train_set, test_set = self.data[0:size], self.data[size:len(self.data)]
+         - no exogenous variables
+         - p=1, d=0, q=2'''
         start = time.time()
-        # don't interpolate missing values in data preparation, take dataset as it is and use missing 
-        # parameter to drop from the training
-        model = ARIMA(endog=train_set[train_set.columns[0]], order=(1,0,2), exog=train_set[train_set.columns[1]])
+        # if not interpolate missing values in data preparation, take dataset as it is
+        # and use missing parameter to drop from the training
+        model = ARIMA(endog=self.train_set[self.train_set.columns[0]], order=(1,0,2))
         model_fit = model.fit()
         end = time.time()
-        forecast_set = model_fit.predict(start=len(train_set), end=len(self.data)-1, exog=test_set[test_set.columns[1]], missing='drop' )
-        print(f'ARIMA training time for {len(test_set)} test instances: \
+        # if missing values use missing='drop'
+        forecast_set = model_fit.predict(start=len(self.train_set), end=len(self.data)-1 )
+        print(f'ARIMA training time for {len(self.test_set)} test instances: \
               {end-start} seconds.')
-        self.plot_forecast(test_set, forecast_set, 'ARIMA')
+        self.plot_forecast(self.test_set, forecast_set, 'ARIMA')
         print(model_fit.summary())
         forecast_set.to_csv('./forecast.csv')
-        print(f'Root Mean Squared Error: {self.calculate_rmse(test_set[test_set.columns[0]], forecast_set)}')
+        print(f'Root Mean Squared Error: \
+              {self.calculate_rmse(self.test_set[self.test_set.columns[0]], forecast_set)}')
 
-    def run_prophet(data):
+    def prepare_prophet(self, data):
+        '''Renames columns to use Prophet model'''
+        data = data.reset_index()
+        renamed = data.rename(columns={data.columns[0]: 'ds',
+                                       data.columns[1]: 'y', data.columns[2]: 'dev_stat'})
+        return renamed
+
+    def run_prophet(self):
         '''Uses Prophet model for predictions'''
+        dataset = self.prepare_prophet(self.data)
+        train_set = self.prepare_prophet(self.train_set)
+        test_set = self.prepare_prophet(self.test_set)
+        start= time.time()
+        model = Prophet(interval_width=0.90)
+        model.add_regressor(train_set.columns[2])
+        model.fit(train_set)
+        end = time.time()
+        print(f'PROPHET training time for {len(test_set)} test instances: \
+              {end-start} seconds.')
+        future_set = model.make_future_dataframe(periods=len(test_set), freq='1min')
+        future_set[test_set.columns[2]] = dataset[dataset.columns[1]]
+        forecast_set = model.predict(future_set)
+        fig = plot_plotly(model, forecast_set)
+        fig_comp = plot_components_plotly(model, forecast_set,figsize=(1200, 200))
+        fig.write_image(f'{"/".join([self.graph_dir,"Prophet"])}.png')
+        fig_comp.write_image(f'{"/".join([self.graph_dir,"Prophet_components"])}.png')
 
-    def run_sarimax(data):
-        '''Uses SARIMAX model for predictions'''
+    def run_sarimax(self):
+        '''Uses SARIMAX model for predictions
+         - seasonal component - 1,0,2,12
+         - use exogenous variables
+         - p=1, d=0, q=2'''
+        start = time.time()
+        # if missing values, use missing='drop'
+        model = SARIMAX(endog=self.train_set[self.train_set.columns[0]], exog=self.train_set[self.train_set.columns[1]], order=(1,0,2), seasonal_order=(1,0,2,12))
+        model_fit = model.fit()
+        end = time.time()
+        forecast_set = model_fit.predict(start=len(self.train_set), end=len(self.data)-1, exog=self.test_set[self.test_set.columns[1]] )
+        print(f'SARIMAX training time for {len(self.test_set)} test instances: \
+              {end-start} seconds.')
+        self.plot_forecast(self.test_set, forecast_set, 'SARIMAX')
+        print(model_fit.summary())
+        forecast_set.to_csv('./forecast.csv')
+        print(f'Root Mean Squared Error: {self.calculate_rmse(self.test_set[self.test_set.columns[0]], forecast_set)}')

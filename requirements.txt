@@ -6,3 +6,6 @@ pandas
 #torch
 matplotlib
 statsmodels
+plotly
+prophet
+kaleido

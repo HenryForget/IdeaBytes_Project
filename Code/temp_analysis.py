@@ -26,6 +26,7 @@ class TempAnalysis():
 
     def prepare_data(self):
         '''Validates data (removes duplicates, fromats, sorts, deals with missing data)'''
+        # TODO: deal with multiple statuses - 
         # remove duplicates
         if not self.data.index.is_unique:
             self.data = self.data.drop_duplicates(keep='first')
@@ -39,10 +40,10 @@ class TempAnalysis():
         self.data = self.data.join(one_hot)
         self.data[self.data.columns[1]] = self.data[self.data.columns[1]].astype(int)
         # resample dataset - will fill the missing values as null
-        # self.data = self.data.asfreq(freq = self.data_freq)
+        self.data = self.data.asfreq(freq = self.data_freq)
         # pchip for interpolation
-        # self.data[self.data.columns[0]] = self.data[self.data.columns[0]].interpolate('pchip')
-        # self.data[self.data.columns[1]] = self.data[self.data.columns[1]].ffill()
+        self.data[self.data.columns[0]] = self.data[self.data.columns[0]].interpolate('pchip')
+        self.data[self.data.columns[1]] = self.data[self.data.columns[1]].ffill()
 
     def calculate_kpss(self):
         ''' Test if the series is stationary using KPSS method'''
