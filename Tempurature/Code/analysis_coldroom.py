@@ -3,7 +3,7 @@ from temp_analysis import TempAnalysis
 from time_series_forecasting import TsForecasting
 
 coldroom = TempAnalysis(datapath='/mnt/c/IdeaBytes/Git/IdeaBytes_Project/Data/Temperature_NewDataSet/ColdRoom_DataLogger.csv',
-                            configpath='/mnt/c/IdeaBytes/Git/IdeaBytes_Project/Code/temp.conf')
+                            configpath='/mnt/c/IdeaBytes/Git/IdeaBytes_Project/Tempurature/Code/temp.conf')
 coldroom.prepare_data()
 print(coldroom.get_stats())
 # coldroom.plot_general(name = 'coldroom_general')
