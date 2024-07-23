@@ -1,0 +1,7 @@
+bin/*
+Documents/*
+include/*
+lib/*
+share/*
+pyvenv.cfg
+

@@ -1,0 +1,11 @@
+numpy
+scikit-learn
+pandas
+#tensorflow
+#keras
+#torch
+matplotlib
+statsmodels
+plotly
+prophet
+kaleido
