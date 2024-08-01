@@ -3,9 +3,10 @@ scikit-learn
 pandas
 #tensorflow
 #keras
-#torch
+# torch
 matplotlib
 statsmodels
 plotly
 prophet
 kaleido
+neuralprophet
