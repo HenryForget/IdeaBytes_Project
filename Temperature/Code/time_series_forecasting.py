@@ -134,25 +134,31 @@ class TsForecasting():
         print(model_fit.summary())
         forecast_set.to_csv('./forecast.csv')
         print(f'Root Mean Squared Error: {self.calculate_rmse(self.test_set[self.test_set.columns[0]], forecast_set)}')
-    
+
     def run_neural_prophet(self):
         '''Uses Neural Prophet model for predictions'''
-        train_set = self.prepare_prophet(self.train_set)
+        data = self.prepare_prophet(self.data)
+        # train_set = self.prepare_prophet(self.train_set)
         test_set = self.prepare_prophet(self.test_set)
         start= time.time()
-        model = NeuralProphet(yearly_seasonality=True, drop_missing=True,
+        model = NeuralProphet(yearly_seasonality=False, drop_missing=True,
                               weekly_seasonality=True, daily_seasonality=True)
         model.add_future_regressor('dev_stat')
-        model.fit(train_set)
+        # model.fit(train_set)
+        model.fit(data)
         end = time.time()
         print(f'PROPHET training time for {len(test_set)} test instances: \
               {end-start} seconds.')
         future_set = {'ds':test_set['ds'], 'y': None, 'dev_stat':test_set['dev_stat']}
         future_set = pd.DataFrame(future_set)
-        forecast_set = model.predict(future_set)
+        # forecast_set = model.predict(future_set)
+        forecast_set = model.predict(data)
+        forecast_test = model.predict(future_set)
         fig = model.plot(forecast_set)
         fig.write_image(f'{"/".join([self.graph_dir,"NeuralProphet"])}.png')
         plt.figure(figsize = (50, 35))
-        plt.plot(test_set['ds'], forecast_set['yhat1'], color='blue', label='Forecast Set')
+        plt.plot(test_set['ds'], forecast_test['yhat1'], color='blue', label='Forecast Set')
         plt.plot(test_set['ds'], test_set['y'], color='black', label = 'Test Set')
         plt.savefig(f'{"/".join([self.graph_dir,"NeuralProphet_plot"])}.png')
+
+
