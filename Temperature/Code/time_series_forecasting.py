@@ -7,8 +7,9 @@ from statsmodels.tsa.statespace.sarimax import SARIMAX
 from prophet import Prophet
 from prophet.plot import (plot_plotly,
 plot_components_plotly)
-# from neuralprophet import NeuralProphet
+from neuralprophet import NeuralProphet
 from pandas.plotting import autocorrelation_plot
+import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 from math import sqrt
@@ -92,7 +93,7 @@ class TsForecasting():
         test_set = self.prepare_prophet(self.test_set)
         start= time.time()
         model = Prophet(interval_width=0.90, seasonality_mode='multiplicative',
-                         yearly_seasonality = 24)
+                         yearly_seasonality = 4)
         model.add_regressor(train_set.columns[2])
         model.fit(train_set)
         end = time.time()
@@ -117,15 +118,16 @@ class TsForecasting():
          - use exogenous variables
          - p=1, d=0, q=2'''
         start = time.time()
-        # if missing values, use missing='drop'
+        self.train_set.index = pd.DatetimeIndex(self.train_set.index).to_period('min')
         model = SARIMAX(endog=self.train_set[self.train_set.columns[0]],
-                        exog=self.train_set[self.train_set.columns[1]], order=(1,0,6),
-                        seasonal_order=(1,0,6,12), missing='drop')
+                        exog=self.train_set[self.train_set.columns[1]], order=(1,0,4),
+                        seasonal_order=(1,0,5,6), missing='drop', freq='min')
         model_fit = model.fit()
         end = time.time()
+
         forecast_set = model_fit.predict(start=len(self.train_set),
                                          end=len(self.data)-1,
-                                         exog=self.test_set[self.test_set.columns[1]] )
+                                         exog=self.test_set[self.test_set.columns[1]])
         print(f'SARIMAX training time for {len(self.test_set)} test instances: \
               {end-start} seconds.')
         self.plot_forecast(self.test_set, forecast_set, 'SARIMAX')
@@ -135,3 +137,22 @@ class TsForecasting():
     
     def run_neural_prophet(self):
         '''Uses Neural Prophet model for predictions'''
+        train_set = self.prepare_prophet(self.train_set)
+        test_set = self.prepare_prophet(self.test_set)
+        start= time.time()
+        model = NeuralProphet(yearly_seasonality=True, drop_missing=True,
+                              weekly_seasonality=True, daily_seasonality=True)
+        model.add_future_regressor('dev_stat')
+        model.fit(train_set)
+        end = time.time()
+        print(f'PROPHET training time for {len(test_set)} test instances: \
+              {end-start} seconds.')
+        future_set = {'ds':test_set['ds'], 'y': None, 'dev_stat':test_set['dev_stat']}
+        future_set = pd.DataFrame(future_set)
+        forecast_set = model.predict(future_set)
+        fig = model.plot(forecast_set)
+        fig.write_image(f'{"/".join([self.graph_dir,"NeuralProphet"])}.png')
+        plt.figure(figsize = (50, 35))
+        plt.plot(test_set['ds'], forecast_set['yhat1'], color='blue', label='Forecast Set')
+        plt.plot(test_set['ds'], test_set['y'], color='black', label = 'Test Set')
+        plt.savefig(f'{"/".join([self.graph_dir,"NeuralProphet_plot"])}.png')
