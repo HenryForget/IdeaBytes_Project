@@ -26,7 +26,7 @@ class TempAnalysis():
         print(f"Features: {self.data.columns}")
 
     def prepare_data(self):
-        '''Validates data (removes duplicates, fromats, sorts, deals with missing data)'''
+        '''Validates data (removes duplicates, formats, sorts, deals with missing data)'''
         # drop duplicated index and reset index
         if not self.data.index.is_unique:          
             self.data = self.data.reset_index().drop_duplicates(subset='Date/Time', keep='first')
