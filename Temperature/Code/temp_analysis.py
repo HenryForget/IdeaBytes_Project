@@ -29,7 +29,7 @@ class TempAnalysis():
         '''Validates data (removes duplicates, formats, sorts, deals with missing data)'''
         # drop duplicated index and reset index
         if not self.data.index.is_unique:          
-            self.data = self.data.reset_index().drop_duplicates(subset='Date/Time', keep='first')
+            self.data = self.data.reset_index().drop_duplicates(subset=self.data.index.name, keep='first')
         # get the number of the column in the file
         col = self.data.shape[1]
         le = LabelEncoder()
