@@ -1,3 +1,4 @@
+import time
 # THIS IS A PLACEHOLDER FOR THE MAIN APP THAT WILL USE data_prep and models classes 
 # Most likely will have couple of REST endpoints so that data can be sent there for predictions
 
@@ -12,3 +13,7 @@
 # launch.
 
 # Once trained, models for each of the devices will be used to predict data based on real-time feed from db. 
+
+while True:
+    time.sleep(1)
+    
