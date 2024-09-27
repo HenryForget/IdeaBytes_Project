@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 
-class TempAnalysis():
+class DataPreparation():
     ''' Temperature analysis '''
     def __init__(self, datapath, configpath) -> None:
         ''' Initialize object '''
@@ -12,12 +12,12 @@ class TempAnalysis():
         config.read(configpath)
         self.date_format = config.get('MAIN','DATE_FORMAT')
         self.index = config.get('MAIN','INDEX')
+        self.data_freq = config.get('MAIN','DATA_FREQ')
         # TODO: we are going to use 3 columns: 1 for datetime (index), 2 for temp, 3 for compressor status (ON/OFF) 
         # TODO: this will indicate number or name of the column that has compressor status. We'll need to query only data we use.
-        self.status_col = int(config.get('MAIN','STATUS_COL'))
+        self.status_col = config.get('MAIN','STATUS_COL')
         # TODO: read data from JSON, not from csv
         # TODO: add compressor data preparation method and class variable to store it
-        # TODO: add outlier detection and cleaning - based on temp thresholds sent from alerting?
         self.data = pd.read_csv(datapath, index_col=[self.index],
                                 parse_dates=[self.index], date_format=self.date_format)
         self.data.index = pd.to_datetime(self.data.index, format='%d-%m-%Y %H:%M')
@@ -33,8 +33,6 @@ class TempAnalysis():
         # get the number of the column in the file
         col = self.data.shape[1]
         le = LabelEncoder()
-        # TODO: we are going to use 3 columns: 1 for datetime (index), 2 for temp, 3 for compressor status (ON/OFF) 
-        # REDO this logic to only applicable to one column. Don't loop.
         for x in range(col):
             if self.data[self.data.columns[x]].dtypes == 'object':
                 # convert categorical to numerical for non numeric data
@@ -43,5 +41,11 @@ class TempAnalysis():
                 self.data[self.data.columns[x]] = label
         #  sort dataset by the first column
         self.data = self.data.sort_index()
+        # fill missing values:
+        # resample dataset - will fill the missing values as null
+        self.data = self.data.asfreq(freq = self.data_freq)
+        # pchip for interpolation
+        self.data[self.data.columns[0]] = self.data[self.data.columns[0]].interpolate('pchip')
+        self.data[self.data.columns[1]] = self.data[self.data.columns[1]].ffill()
         print(f"Total instances after data preparation: {len(self.data)}")
 
