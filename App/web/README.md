@@ -1,0 +1,1 @@
+This is a placeholder for Django app that will create a GUI for the alerting and plotting.

@@ -8,6 +8,7 @@ services:
     environment:
       PGRST_DB_URI: postgres://app_user:password@db:5432/app_db
       PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
+      PGRST_DB_ANON_ROLE: web_anon
     depends_on:
       - db
     networks:
@@ -17,6 +18,9 @@ services:
     image: postgres
     volumes:
       - db-data:/var/lib/postgresql@17/data
+      - type: bind
+        source: ./init-data
+        target: /var/lib/postgresql@17
     expose:
       - 5432
     ports:

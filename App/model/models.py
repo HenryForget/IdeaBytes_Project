@@ -12,7 +12,7 @@ class TsForecasting():
         self.data = dataset
         self.temp_model = None
         self.compr_model = None
-        # TODO: We'll need to add model for compressor efficiency prediction
+    # TODO: We'll need to add model for compressor efficiency prediction
 
     def run_sarimax(self):
         '''Uses SARIMAX model for predictions

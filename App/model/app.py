@@ -32,8 +32,8 @@ model_trained = model.run_sarimax()
 
 @app.get("/predict")
 # def get_predict(period, real_data)
-async def get_predict(period: int=60):
-    '''Runs the trained model with the real-time data and returns '''
+async def get_predict(period: int=8):
+    '''Runs the trained model with the real-time data and returns predicted period datapoints'''
     real_data = DataPreparation(datapath='/app/ColdRoom_DataLogger_daily.csv',
                                 configpath='/app/temp.conf')
     real_data.prepare_data()
