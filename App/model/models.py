@@ -29,8 +29,7 @@ class TsForecasting():
         '''Takes current model and predicts future data based on real-time input
         - data is last 24 hours real-time db data'''
         forecast_set = model_fit.apply(data[data.columns[0]])
-        forecasted = forecast_set.forecast(period).to_json()
-        forecasted = json.dumps(forecasted)
+        forecasted = forecast_set.forecast(period).to_json(date_format = 'iso')
         return forecasted
 
     # TODO: add method that will use real-time data to predict compressor trend
