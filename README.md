@@ -1,3 +1,4 @@
+
 This is a tentative structure for the app:
 1. alerting.py:
  - GUI: graphs with real-data, predictions, and alerts level.
@@ -23,5 +24,6 @@ This is a tentative structure for the app:
 - will have basic config for data processing
 
 THINGS TO ADD apart from methods inside exising files:
-- script that will create mock data every 5 minutes and push it to db
+~~- script that will create mock data every 5 minutes and push it to db~~
 - script that will push initial data to db that we will use for model training  - this is not a part of app when in prod.
+
