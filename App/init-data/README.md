@@ -2,6 +2,7 @@ docker-compose file contains database name that is created when containers are b
 
 To add data to database app_db: 
 1. open Postgres terminal in a running container
+2. cd to /var/lib/postgresql@17
 2. run: 
 psql "host=localhost port=5432 dbname=app_db user=app_user password=password" -f create_table.sql
 psql "host=localhost port=5432 dbname=app_db user=app_user password=password" -f <file with data>.sql

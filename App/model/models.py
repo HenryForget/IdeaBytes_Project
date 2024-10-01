@@ -21,7 +21,7 @@ class TsForecasting():
          - p=1, d=0, q=2'''
         self.temp_model = SARIMAX(endog=self.data[self.data.columns[0]],  enforce_stationarity=False,
                         order=(1,1,1), mle_regression = False,
-                        seasonal_order=(1,0,0,12), missing='drop', freq='min',  time_varying_regression=True)
+                        seasonal_order=(1,0,0,12), missing='drop', freq='h',  time_varying_regression=True)
         model_fit = self.temp_model.fit()
         return model_fit
 
