@@ -1,5 +1,9 @@
 from temp_analysis import TempAnalysis
 from compressor_efficiency_2 import compEff
+import numpy as np
+from scipy import stats
+import matplotlib.pyplot as plt
+
 
 coldroom = TempAnalysis(datapath='../Data/eff_data_test.csv',
                             configpath='temp.conf')
@@ -41,10 +45,23 @@ print(deg_per_hour)
 # compEff.plotPeaksValleys(dateTime, values, peaks, valleys, comp_stat, deg_per_hour)
 
 ### deg_per_hour now holds list of 'Degrees of cooling per hour' ###
-### TODO: Run trend analysis on list of values, determine how fast compressor effeciency is degrading.
+### TODO: Clean up this code, move it to comp eff 2 and make it a callable function.
 
+# x values for plot/linRegress
+x_vals = np.array([], dtype=np.int8)
 
+# Plot data and add i to x_vals
+for i in range(len(deg_per_hour)):
+    plt.scatter(i, deg_per_hour[i], color='green')
+    x_vals = np.append(x_vals, i)
+plt.show()
 
+# Get line of best fit and print slope
+slope, intercept, r_value, p_value, std_err = stats.linregress(x_vals, deg_per_hour)
+print(slope)
+
+### Slope of this line (slope) is what we're looking for. Can be displayed as:
+### Compressor effeciency is trending (slope) degrees per compressor cycle.
 
 
 
