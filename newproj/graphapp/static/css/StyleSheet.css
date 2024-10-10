@@ -1,0 +1,133 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa; /* Light gray*/
+    margin: 0;
+    padding: 0;
+}
+
+.main-header {
+    background-color: #3b5998; /* Blue */
+    color: white;
+    padding: 30px 0;
+    text-align: center;
+}
+
+.main-header h1 {
+    margin: 0;
+    font-size: 3rem;
+}
+
+/* Navigation Styles */
+nav {
+    background-color: #1a73e8; /* Lighter blue */
+    text-align: center;
+    padding: 15px 0;
+}
+
+nav ul {
+    list-style: none; /* No bullets */
+    margin: 0;
+    padding: 0;
+}
+
+nav li {
+    display: inline-block;
+    margin: 0 15px; /* Adjusted margin */
+}
+
+nav a {
+    color: white; /* White*/
+    text-decoration: none;
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+nav a:hover {
+    background-color: #ff9800; /* Orange on hover */
+}
+
+/* Container Styling */
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: white; /* White */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Light shadow */
+    border-radius: 8px;
+}
+
+/* Title Styling */
+.title {
+    font-size: 2rem;
+    color: #3b5998; /* Blue */
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.graph-section {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.graph-section h2 {
+    font-size: 1.8rem;
+    color: #34495e;
+    margin-bottom: 10px;
+}
+
+.graph-img {
+    border: 2px solid #2c3e50;
+    padding: 5px;
+    width: 90%;
+    max-width: 900px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table th, table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+table th {
+    background-color: #3b5998;
+    color: white;
+}
+
+table tr:nth-child(even) {
+    background-color: #e3f2fd;
+}
+
+/* Threshold Styling */
+.threshold {
+    color: rgb(33, 150, 243);
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 5px;
+    transition: background-color 0.3s;
+}
+
+.threshold:hover {
+    background-color: rgb(255, 235, 59);
+}
+
+/* Alert Status Styling */
+.status {
+    font-size: 1.2rem;
+}
+
+.alert-warning {
+    color: red;
+}
+.alert-good {
+    color: green;
+}
