@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Django==3.2.16
 asgiref==3.4.1
 autopep8==1.6.0
@@ -9,3 +10,17 @@ sqlparse==0.4.2
 toml==0.10.2
 whitenoise==5.3.0
 django-environ==0.8.1
+=======
+numpy
+scikit-learn
+pandas
+tensorflow
+keras
+torch
+matplotlib
+statsmodels
+plotly
+prophet
+kaleido
+neuralprophet
+>>>>>>> 43f5d20a99722d5de021ee764a4bd8b9e3d63c19

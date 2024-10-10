@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -28,4 +29,12 @@ staticfiles/*
 apps/static/assets/node_modules
 apps/static/assets/yarn.lock
 apps/static/assets/.temp
+=======
+bin/*
+Documents/*
+include/*
+lib/*
+share/*
+pyvenv.cfg
+>>>>>>> 43f5d20a99722d5de021ee764a4bd8b9e3d63c19
 
