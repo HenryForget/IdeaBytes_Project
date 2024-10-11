@@ -16,14 +16,24 @@ class DataPreparation():
         self.index = config.get('MAIN','INDEX')
         self.data_freq = config.get('MAIN','DATA_FREQ')
         self.status_col = config.get('MAIN','STATUS_COL')
+        # this is for the initial data preparations and training models
+        # we might change it later but now it's not needed
         self.data = pd.read_csv(datapath, index_col=[self.index],
                                 parse_dates=[self.index], date_format=self.date_format)
         self.data.index = pd.to_datetime(self.data.index, format=self.date_format)
         print(f"Total instances before data preparation: {len(self.data)}")
         print(f"Features: {self.data.columns}")
-
+   
+    # TODO We need a method to prepare data from Json returned from database
+    def convert_from_json(self, data):
+        '''Converts JSON format to pandas df format and returns the df for further processing'''
+        # TODO 
+        return pd_data
+        
     def prepare_data(self):
-        '''Validates data (removes duplicates, formats, sorts, deals with missing data)'''
+        '''Validates data (removes duplicates, formats, sorts, deals with missing data)
+        :return pandas dataframe 
+        '''
         # remove duplicates
         if not self.data.index.is_unique:
             self.data = self.data.reset_index().drop_duplicates(subset=self.data.index.name)
@@ -105,7 +115,7 @@ class DataPreparation():
         return time_diffs
 
     def get_temp_diffs(self, peaks, valleys):
-        '''returns temperature differences'''
+        '''Returns temperature differences'''
         values =  self.data[self.data.columns[0]].to_numpy()
         temp_diffs = []
         for i in range(peaks.size):
