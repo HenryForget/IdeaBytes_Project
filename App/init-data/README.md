@@ -9,7 +9,7 @@ psql "host=localhost port=5432 dbname=app_db user=app_user password=password" -f
 These 2 commands will create a table with device name provided in sql file and import the data from csv you add to the init-data folder.
 3. Check the data from Postgres container: 
 - get into db: psql "host=localhost port=5432 dbname=app_db user=app_user password=password"
-- inside the db: select * from api.device_1;
+- inside the db: select * from public.device_1;
 4. Check the data from REST interface:
 - check the ip address assigned for the PostgREST container: docker network inspect app_idb
 - run the command: curl "http://<ip address of postgrest server>:3000/<table name>"
