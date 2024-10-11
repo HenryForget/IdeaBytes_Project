@@ -7,11 +7,23 @@ CREATE TABLE public.device_1 (
   temp REAL,
   compStat VARCHAR(50)
 );
+
+DROP TABLE IF EXISTS public.device_2;
+CREATE TABLE public.device_2 (
+  id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  time_data VARCHAR(255),
+  temp REAL,
+  evapTemp REAL,
+  defroStat VARCHAR(50),
+  compStat VARCHAR(50),
+  evapStat VARCHAR(50)
+);
 -- This part os the file is needed to create anonymous REST API calls using PostgREST interface
 CREATE ROLE web_anon nologin;
 
 GRANT usage ON SCHEMA public TO web_anon;
 GRANT SELECT ON public.device_1 TO web_anon;
+GRANT SELECT ON public.device_2 TO web_anon;
 GRANT web_anon to app_user;
 
 

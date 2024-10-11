@@ -50,9 +50,11 @@ services:
   web:
     build: web 
     volumes:
-    - type: bind
-      source: ./web/alerting.py
-      target: /web/alerting.py
+      - type: bind
+        source: ./web
+        target: /web
+    ports: 
+      - '8000:8000'
     networks:
       - idb
 

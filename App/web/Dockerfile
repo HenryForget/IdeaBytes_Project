@@ -10,4 +10,4 @@ EXPOSE 8000
 COPY . /web 
 
 ENTRYPOINT ["python3"] 
-CMD ["alerting.py"]
+CMD ["manage.py", "runserver", "0.0.0.0:8000"]
