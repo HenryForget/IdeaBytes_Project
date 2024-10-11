@@ -1,4 +1,5 @@
 TODO for this part:
+<br/>
 0. Set up the list of devices. We will show them in a dropdown menu. For each of the devices graph page will be showing 3 graphs: one with real data (see p. 1), one with predicted data (see p.3), one with compressor efficiency (see p. 3).
  - we probably can  get names of devices from the PostgREST, we will double check that. If not, we will read the list from the JSON file that we will add to the webapp folder.
 1. Set up method that calls database to render graphs from the "real" data
