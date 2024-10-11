@@ -2,7 +2,8 @@
 import json
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 import pandas as pd
-
+import numpy as np
+from scipy import stats
 
 
 class TsForecasting():
@@ -12,7 +13,6 @@ class TsForecasting():
         self.data = dataset
         self.temp_model = None
         self.compr_model = None
-    # TODO: We'll need to add model for compressor efficiency prediction
 
     def run_sarimax(self):
         '''Uses SARIMAX model for predictions
@@ -32,4 +32,15 @@ class TsForecasting():
         forecasted = forecast_set.forecast(period).to_json(date_format = 'iso')
         return forecasted
 
-    # TODO: add method that will use real-time data to predict compressor trend
+    def add_data(self, initial, new_data):
+        '''Adds new data to initial degrees values and calculates the updtaed x values'''
+        # TODO - add new degrees to the initial ones
+        
+    def predict_slope(self, degrees):
+        '''Calculates slope (compressor efficiency) based on the data'''
+        x_vals = np.array([], dtype=np.int8)
+        for i in range(len(degrees)):
+            x_vals = np.append(x_vals, i)
+        slope = stats.linregress(x_vals, degrees)
+        return slope
+

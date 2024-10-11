@@ -4,6 +4,7 @@ pandas
 matplotlib
 statsmodels
 plotly
-fastapi[standard]
+scipy
+fastapi[standard]==0.115.0
 uvicorn==0.30.6
 pydantic==2.9.2
