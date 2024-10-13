@@ -1,4 +1,4 @@
-Date/Time,Room Temp (deg C),compStat
+time_data,temp,compstat
 01-05-2024 00:00,-17.6,ON
 01-05-2024 00:01,-17.6,ON
 01-05-2024 00:02,-17.5,ON
