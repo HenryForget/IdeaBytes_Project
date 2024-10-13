@@ -15,7 +15,7 @@ services:
       - idb
   
   db:
-    image: postgres
+    image: postgres:17-bullseye
     volumes:
       - db-data:/var/lib/postgresql@17/data
       - type: bind

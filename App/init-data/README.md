@@ -13,4 +13,4 @@ These 2 commands will create a table with device name provided in sql file and i
 4. Check the data from REST interface:
 - check the ip address assigned for the PostgREST container: docker network inspect app_idb
 - run the command: curl "http://app-server-1:3000/<table name>" where app-server-1 is a container name OR you can use ip adress instead of the container name
-- in the browser: http://<ip address of postgrest server>:3000/<table name>
+- in the browser: http://\<ip address of postgrest server\>:3000/<table name>

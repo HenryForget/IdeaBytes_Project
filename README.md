@@ -1,10 +1,10 @@
 
 This is a tentative structure for the app:
-1. alerting.py:
+1. web folder with Django setup:
  - GUI: graphs with real-data, predictions, and alerts level.
  - will allow to set thresholds for temperature (and store it as an instance variable for each device/client?)
- - will have endpoint allowing to post predictions datapoints
- - will display predictions along with alert (if applicable) in UI
+ - will have endpoint allowing to post compressor efficiency slope
+ - will display predictions along with alert limit (if applicable) in UI
  - will query db to use data for graphs 
 
 2. app.py:
@@ -25,5 +25,5 @@ This is a tentative structure for the app:
 
 THINGS TO ADD apart from methods inside exising files:
 ~~- script that will create mock data every 5 minutes and push it to db~~
-- script that will push initial data to db that we will use for model training  - this is not a part of app when in prod.
+~~- script that will push initial data to db that we will use for model training  - this is not a part of app when in prod.~~
 

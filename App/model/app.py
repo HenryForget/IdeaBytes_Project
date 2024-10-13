@@ -45,6 +45,11 @@ model_trained = model.run_sarimax()
 # prepare initial compressor efficiency
 model.compr_model = model.predict_slope(deg_per_hour)
 
+# TODO We need to post the initial compressor efficiency to GUI endpoint to create a graph. 
+# this will be done just once upon app lunch. 
+# later on the call from GUI will get results from "real" data,
+# add it to the initial one and will update the compressor efficiency graph
+
 @app.get("/comp_eff")
 async def get_comp_eff(device):
     '''Prepares current data and returns the slope for the predicted compressor efficiency'''
