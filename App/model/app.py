@@ -1,6 +1,8 @@
 import sys
+import json
 from fastapi import FastAPI
 sys.path.append('/app')
+import requests as req
 from data_prep import DataPreparation
 from models import TsForecasting
 # THIS IS A PLACEHOLDER FOR THE MAIN APP THAT WILL USE data_prep and models classes
@@ -17,11 +19,14 @@ from models import TsForecasting
 
 # Once trained, models for each of the devices will be used to predict data based on real-time feed from db. 
 
+# TODO: we need to run this for more than one device (current implementation). There should be
+# probably a factory of devices that is created upon the app launch. The list of devices 
+# could be in a config file, python fileor json file.
 
 app = FastAPI()
 # prepare data
-temp_data = DataPreparation(datapath='/app/ColdRoom_DataLogger_month.csv',
-                            configpath='/app/temp.conf')
+temp_data = DataPreparation(configpath='/app/temp.conf')
+temp_data.read_csv_data(datapath='/app/ColdRoom_DataLogger_month.csv')
 temp_data.prepare_data()
 # prepare data for compresor efficiency plot
 # prepare peaks and valleys from temperature data
@@ -41,10 +46,11 @@ model_trained = model.run_sarimax()
 model.compr_model = model.predict_slope(deg_per_hour)
 
 @app.get("/comp_eff")
-async def get_comp_eff():
+async def get_comp_eff(device):
     '''Prepares current data and returns the slope for the predicted compressor efficiency'''
-    real_data = DataPreparation(datapath='/app/ColdRoom_DataLogger_daily.csv',
-                                configpath='/app/temp.conf')
+    real_data = DataPreparation(configpath='/app/temp.conf')
+    json_data = get_data(device)
+    real_data.read_json_data(json_data)
     real_data.prepare_data()
     rpeaks, rvalleys = real_data.get_peaks_valleys_status()
     rtime_diffs = real_data.get_time_diffs(rpeaks,rvalleys)
@@ -55,12 +61,22 @@ async def get_comp_eff():
     return compr_updated
 
 @app.get("/predict")
-async def get_predict(period: int=1):
+async def get_predict(device, period: int=1):
     '''Runs the trained model with the real-time data and returns '''
-    real_data = DataPreparation(datapath='/app/ColdRoom_DataLogger_daily.csv',
-                                configpath='/app/temp.conf')
+    real_data = DataPreparation(configpath='/app/temp.conf')
+    json_data = get_data(device)
+    real_data.read_json_data(json_data)
     real_data.prepare_data()
     predict = model.predict(real_data.data, model_trained, period)
     return predict
 
-    
+def get_data(device_table):
+    # TODO: addperiod depth in query - 1 day back from the call perhaps?
+    '''Queries database and returns data in json string'''    
+    uri = f"http://app-server-1:3000/{device_table}"
+    data_req = req.get(url=uri, timeout=30, verify=False)
+    if data_req.status_code != 200:
+        # TODO deal with None in response in respective methods
+        return None
+    json_string = json.dumps(data_req.json(), indent=2)
+    return json_string
