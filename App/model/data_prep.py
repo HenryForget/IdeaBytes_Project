@@ -1,4 +1,5 @@
 '''This module handles temperature data. Methods are used to prepare and validate data for later training'''
+from io import StringIO
 import configparser
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -8,21 +9,38 @@ from scipy import stats
 
 class DataPreparation():
     ''' Temperature analysis '''
-    def __init__(self, datapath, configpath) -> None:
+    def __init__(self, configpath) -> None:
         ''' Initialize object '''
         config = configparser.ConfigParser()
         config.read(configpath)
+        self.temp_col = config.get('MAIN','TEMP_COL')
+        self.stat_col = config.get('MAIN', 'STATUS_COL')
         self.date_format = config.get('MAIN','DATE_FORMAT')
-        self.index = config.get('MAIN','INDEX')
         self.data_freq = config.get('MAIN','DATA_FREQ')
-        self.status_col = config.get('MAIN','STATUS_COL')
-        self.data = pd.read_csv(datapath, index_col=[self.index],
-                                parse_dates=[self.index], date_format=self.date_format)
+        self.index = config.get('MAIN','INDEX')
+        self.data = None
+
+    def index_to_datetime(self) -> None:
+        '''Converts index data to datetime format'''
         self.data.index = pd.to_datetime(self.data.index, format=self.date_format)
         print(f"Total instances before data preparation: {len(self.data)}")
         print(f"Features: {self.data.columns}")
 
-    def prepare_data(self):
+    def read_json_data(self, data_json) -> None:
+        '''Reads data from json string'''
+        self.data = pd.read_json(StringIO(data_json))
+        self.data.index = self.data[self.index]
+        columns = [self.temp_col, self.stat_col]
+        self.data = self.data[columns]
+        self.index_to_datetime()
+
+    def read_csv_data(self, datapath) -> None:
+        '''Reads data from csv file'''
+        self.data = pd.read_csv(datapath, index_col=[self.index],
+                                parse_dates=[self.index], date_format=self.date_format)
+        self.index_to_datetime()
+
+    def prepare_data(self) -> None:
         '''Validates data (removes duplicates, formats, sorts, deals with missing data)'''
         # remove duplicates
         if not self.data.index.is_unique:
@@ -46,8 +64,8 @@ class DataPreparation():
         self.data[self.data.columns[0]] = self.data[self.data.columns[0]].interpolate('pchip')
         self.data[self.data.columns[1]] = self.data[self.data.columns[1]].ffill()
         print(f"Total instances after data preparation: {len(self.data)}")
-    
-    def get_peaks_valleys_status(self):
+   
+    def get_peaks_valleys_status(self) -> tuple[list, list]:
         '''
             Uses compressor status to construct peak/valley pairs.
             :return peaks: array of peak indices
@@ -96,7 +114,7 @@ class DataPreparation():
         # return the two arrays.
         return peaks, valleys
     
-    def get_time_diffs(self, peaks, valleys):
+    def get_time_diffs(self, peaks, valleys) -> list:
         '''Returns time differences'''
         dateTime = self.data.index.to_numpy()
         time_diffs = []
@@ -104,7 +122,7 @@ class DataPreparation():
             time_diffs.append((dateTime[valleys[i]] - dateTime[peaks[i]]) / np.timedelta64(1, 'h'))
         return time_diffs
 
-    def get_temp_diffs(self, peaks, valleys):
+    def get_temp_diffs(self, peaks, valleys)-> list:
         '''returns temperature differences'''
         values =  self.data[self.data.columns[0]].to_numpy()
         temp_diffs = []
@@ -112,7 +130,7 @@ class DataPreparation():
             temp_diffs.append(values[peaks[i]] - values[valleys[i]])
         return temp_diffs
 
-    def get_degrees_per_hour(self, peaks, temp_diffs, time_diffs):
+    def get_degrees_per_hour(self, peaks, temp_diffs, time_diffs) -> list:
         '''Returns degrees per hour'''
         deg_per_hour = []
         for i in range(peaks.size):
