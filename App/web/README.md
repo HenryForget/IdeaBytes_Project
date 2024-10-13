@@ -10,7 +10,8 @@ TODO for this part:
  - graph will be drawn from the pandas dataframe
  -graph should also check if thresholds are set up and if yes, it should show them as horizontal lines
 2. Set up method that calls app-backend for temp predictions
- - method will be called on demand -> we need a button for it
+ - method will be called on demand -> we need a button for it. This will work as such: the default prediction time is 1 hour, but we should gove a choice of 4 hours and 8 hours prediction intervals.
+ - method will need to pass device and prediction interval (if 4 and 8 hours chosen) for which it calls the prediction method. 
  - method will call the REST API of the app-backend container (model folder scripts in repo) 
  - method will receive a tuple of JSON data from the app-backend: first one is real data, second - prediction.
  - method will convert the received data to pandas dataframes 
