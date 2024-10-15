@@ -37,43 +37,31 @@ def show_graphs(request):
     return render(request, 'graphs.html')
 
 
-def read_devices_from_csv():
-    devices = []
+def get_device_options():
+    # Simulated device names (this will be replaced with JSON file reading later)
+    devices = [
+        {"id": 1, "name": "Cold Room"},
+        {"id": 2, "name": "Freezer"},
+        {"id": 3, "name": "Freezer Room"},
+        {"id": 4, "name": "Kitchen Chiller"},
+    ]
 
-    csv_file_path = r'C:\black-dashboard-django-master\black-dashboard-django-master\newproj\graphapp\utils\IdeaBytes_Project\Temperature\Data\Temperature_NewDataSet\ColdRoom_DataLogger.csv'
-
-    # Use the filename as the device name
-    devices.append({
-        'name': os.path.basename(csv_file_path)
-    })
+    # Future implementation for reading from JSON:
+    # json_path = 'path_to_your_json_file'
+    # with open(json_path, 'r') as file:
+    #     devices = json.load(file)
 
     return devices
 
+
 def device_thresholds(request):
-    devices = read_devices_from_csv()
+    devices = get_device_options()  # Call the device retrieval function
     context = {
         'devices': devices
     }
     return render(request, 'threshold.html', context)
 
-#---------------------------------------------------------------------------------------
 
-#simulate devices for now, will be modifed later to use the actual JSON file
 def device_Options(request):
-    # Simulated device names (this will be replaced with JSON file reading later)
-    devices = [
-        {"id": 1, "name": "Cold Room"},
-        {"id": 2, "name": "Freezer"},
-        {"id": 3, "name": "FreezerRoom"},
-        {"id": 4, "name": "Kitchen_Chiller"},
-    ]
-
-
-    #uing the json file would look like
-    #----
-    #json_path  = 'path'
-    #open (json_path, 'r') as file
-    #devised  = loead file
-    #blah blah blah
-
-    return render(request, 'DeviceGraph.html', {'devices' : devices}) #this will stay this same
+    devices = get_device_options()  # Call the same function for device options
+    return render(request, 'DeviceGraph.html', {'devices': devices})  # This will stay the same

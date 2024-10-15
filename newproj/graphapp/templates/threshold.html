@@ -7,21 +7,28 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/StyleSheet.css' %}">
 
-    <!--Chart.js and Chart.js Annotation Plugin (need this)-->
+    <!-- Chart.js and Chart.js Annotation Plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+    <style>
+        /* CSS to control canvas size */
+        canvas {
+            width: 400px !important;  /* Fixed width */
+            height: 200px !important; /* Fixed height */
+            max-width: 100%; /* Responsive */
+            max-height: 100%; /* Responsive */
+        }
+    </style>
 </head>
 <body>
 <header class="main-header">
     <h1>Temperature Threshold System</h1>
 </header>
 
-
 <nav>
     <ul class="navbar">
         <li><a href="{% url 'plot_general' %}">Show Graph</a></li>
         <li><a href="{% url 'device_thresholds' %}">Set Thresholds</a></li>
-        <!-- added link for DeviceGraph page -->
         <li><a href="{% url 'device_options' %}">Device Graphs</a></li>
     </ul>
 </nav>
@@ -47,11 +54,11 @@
             </span>
         </td>
         <td>
-            <canvas id="graph_{{ device.name }}" width="400" height="200"></canvas>
+            <canvas id="graph_{{ device.name }}" style="display: none;"></canvas> <!-- Hidden initially -->
         </td>
         <td>
             <span class="alert-message" id="alert_{{ device.name }}">
-                All good! <span class="alert-good">✅</span> <!-- This is the default message -->
+                All good! <span class="alert-good">✅</span> <!-- Default message -->
             </span>
         </td>
     </tr>
@@ -68,20 +75,24 @@
     function createGraph(deviceName, lowThreshold, highThreshold) {
         const ctx = document.getElementById(`graph_${deviceName}`).getContext('2d');
 
-        const data = {
-            labels: [],
-            datasets: []
-        };
+        // Show the canvas
+        const canvas = document.getElementById(`graph_${deviceName}`);
+        canvas.style.display = 'block';
 
         const config = {
             type: 'line',
-            data: data,
+            data: {
+                labels: [], // Leave empty for now
+                datasets: [] // Leave empty for now
+            },
             options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 scales: {
                     y: {
                         beginAtZero: true,
-                        min: Math.min(lowThreshold, 0) - 5, // Adjust min to allow negative thresholds
-                        max: Math.max(lowThreshold, highThreshold) + 5 // Adjust y-axis based on thresholds
+                        min: Math.min(lowThreshold, 0) - 5,
+                        max: Math.max(lowThreshold, highThreshold) + 5
                     }
                 },
                 plugins: {
@@ -117,11 +128,11 @@
             }
         };
 
-        // Create and return the graph
+        // Create the graph
         new Chart(ctx, config);
     }
 
- function setThreshold(deviceName) {
+    function setThreshold(deviceName) {
         const lowThreshold = Number(prompt('Enter low threshold:')); // Convert to number
         const highThreshold = Number(prompt('Enter high threshold:')); // Convert to number
 
@@ -129,14 +140,14 @@
             document.getElementById(`threshold_${deviceName}`).textContent = `Low: ${lowThreshold} | High: ${highThreshold}`;
             createGraph(deviceName, lowThreshold, highThreshold);
 
-            // Check if the thresholds are acceptable and update the alert status
+            // Update the alert status
             const alertElement = document.getElementById(`alert_${deviceName}`);
             if (lowThreshold < highThreshold) {
-                alertElement.innerHTML = '<span class="alert-good">✅</span> All Good!'; // Display check mark if within range
+                alertElement.innerHTML = '<span class="alert-good">✅</span> All Good!'; // Display check mark
                 alertElement.classList.remove('alert-warning');
                 alertElement.classList.add('alert-good');
             } else {
-                alertElement.innerHTML = '<span class="alert-warning">❌</span> Warning'; // Display red cross if thresholds are not valid
+                alertElement.innerHTML = '<span class="alert-warning">❌</span> Warning'; // Display red cross
                 alertElement.classList.remove('alert-good');
                 alertElement.classList.add('alert-warning');
             }
