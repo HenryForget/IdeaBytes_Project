@@ -2,41 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Updated Graph Page</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/StyleSheet.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
- <header class="main-header">
-        <h1>Graph Displays</h1>
+<header class="main-header">
+    <h1>Graph Displays</h1>
 
-    </header>
+</header>
 
- <nav>
-        <ul class="navbar">
-            <li><a href="{% url 'plot_general' %}">Show Graph</a></li>
-            <li><a href="{% url 'device_thresholds' %}">Set Thresholds</a></li>
-         <!-- add link for DeviceGraph page -->
+<nav>
+    <ul class="navbar">
+        <li><a href="{% url 'plot_general' %}">Show Graph</a></li>
+        <li><a href="{% url 'device_thresholds' %}">Set Thresholds</a></li>
+        <!-- added link for DeviceGraph page -->
+        <li><a href="{% url 'device_options' %}">Device Graphs</a></li>
 
-        </ul>
-    </nav>
+    </ul>
+</nav>
 
-<h1>Device Specific Graphs</h1>
+<h1>Select a Device</h1>
+<select id="device-dropdown">
+    <option value="">Select a device</option>
+    {% for device in devices %}
+    <option value="{{ device.id }}">{{ device.name }}</option>
+    {% endfor %}
+</select>
 
-<form method="POST">
+<div id="graphs-container" style="display:none;">
+    <h2>Graphs for Selected Device</h2>
+    <div id="graph1" style="border: 1px solid #ccc; height: 200px; margin: 10px 0;">Graph 1 Placeholder</div>
+    <div id="graph2" style="border: 1px solid #ccc; height: 200px; margin: 10px 0;">Graph 2 Placeholder</div>
+    <div id="graph3" style="border: 1px solid #ccc; height: 200px; margin: 10px 0;">Graph 3 Placeholder</div>
+</div>
+<script>
+    $(document).ready(function(){
+        $('#device-dropdown').change(function() {
+            var selectedDevice = $(this).val();
+            if (selectedDevice) {
+                $('#graphs-container').show(); // Show the graph container when a device is selected
+            } else {
+                $('#graphs-container').hide(); // Hide when no device is selected
+            }
 
-    {% csrf_token %}
-    <label for="device">Select a device:</label>
-
-    <select name="device" id="device">
-        {% for device in devices %}
-            <option value="{{ device.id }}">{{ device.name }}</option>
-        {% endfor %}
-    </select>
-
-    <input type="submit" value="Submit">
-</form>
+        });
+    });
+</script>
 
 
 </body>

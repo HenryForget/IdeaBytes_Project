@@ -12,15 +12,17 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
 </head>
 <body>
-  <header class="main-header">
-        <h1>Temperature Threshold System</h1>
-    </header>
+<header class="main-header">
+    <h1>Temperature Threshold System</h1>
+</header>
 
 
 <nav>
     <ul class="navbar">
         <li><a href="{% url 'plot_general' %}">Show Graph</a></li>
         <li><a href="{% url 'device_thresholds' %}">Set Thresholds</a></li>
+        <!-- added link for DeviceGraph page -->
+        <li><a href="{% url 'device_options' %}">Device Graphs</a></li>
     </ul>
 </nav>
 
@@ -47,7 +49,7 @@
         <td>
             <canvas id="graph_{{ device.name }}" width="400" height="200"></canvas>
         </td>
-          <td>
+        <td>
             <span class="alert-message" id="alert_{{ device.name }}">
                 All good! <span class="alert-good">✅</span> <!-- This is the default message -->
             </span>
