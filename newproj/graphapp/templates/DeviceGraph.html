@@ -2,9 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Updated Graph Page</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/StyleSheet.css' %}">
 </head>
 <body>
+ <header class="main-header">
+        <h1>Graph Displays</h1>
+
+    </header>
+
+ <nav>
+        <ul class="navbar">
+            <li><a href="{% url 'plot_general' %}">Show Graph</a></li>
+            <li><a href="{% url 'device_thresholds' %}">Set Thresholds</a></li>
+         <!-- add link for DeviceGraph page -->
+
+        </ul>
+    </nav>
+
+<h1>Device Specific Graphs</h1>
+
+<form method="POST">
+
+    {% csrf_token %}
+    <label for="device">Select a device:</label>
+
+    <select name="device" id="device">
+        {% for device in devices %}
+            <option value="{{ device.id }}">{{ device.name }}</option>
+        {% endfor %}
+    </select>
+
+    <input type="submit" value="Submit">
+</form>
+
 
 </body>
 </html>

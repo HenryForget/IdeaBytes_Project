@@ -55,3 +55,25 @@ def device_thresholds(request):
         'devices': devices
     }
     return render(request, 'threshold.html', context)
+
+#---------------------------------------------------------------------------------------
+
+#simulate devices for now, will be modifed later to use the actual JSON file
+def device_Options(request):
+    # Simulated device names (this will be replaced with JSON file reading later)
+    devices = [
+        {"id": 1, "name": "Cold Room"},
+        {"id": 2, "name": "Freezer"},
+        {"id": 3, "name": "FreezerRoom"},
+        {"id": 4, "name": "Kitchen_Chiller"},
+    ]
+
+
+    #uing the json file would look like
+    #----
+    #json_path  = 'path'
+    #open (json_path, 'r') as file
+    #devised  = loead file
+    #blah blah blah
+
+    return render(request, 'DeviceGraph.html', {'devices' : devices}) #this will stay this same
