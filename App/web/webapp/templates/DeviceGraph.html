@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Updated Graph Page</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/StyleSheet.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<header class="main-header">
+    <h1>Graph Displays</h1>
+</header>
+
+<nav>
+    <ul class="navbar">
+        <li><a href="{% url 'plot_general' %}">Show Graph</a></li>
+        <li><a href="{% url 'device_thresholds' %}">Set Thresholds</a></li>
+        <li><a href="{% url 'device_options' %}">Device Graphs</a></li>
+    </ul>
+</nav>
+
+<h1>Select a Device</h1>
+<div class="custom-dropdown">
+    <div class="select-selected">Select a device</div>
+    <div class="select-items">
+        {% for device in devices %}
+        <div data-value="{{ device.id }}">{{ device.name }}</div>
+        {% endfor %}
+    </div>
+</div>
+<select id="device-dropdown" style="display:none;">
+    <option value="">Select a device</option>
+    {% for device in devices %}
+    <option value="{{ device.id }}">{{ device.name }}</option>
+    {% endfor %}
+</select>
+
+<div id="graphs-container" style="display:none;">
+    <h2 id="selected-device-title">Graphs for Selected Device</h2>
+    <div id="graph1" style="border: 1px solid #ccc; height: 200px; margin: 10px 0;">Real Time Graph Placeholder</div>
+    <div id="graph2" style="border: 1px solid #ccc; height: 200px; margin: 10px 0;">Predicted Temp Graph Placeholder</div>
+    <div id="graph3" style="border: 1px solid #ccc; height: 200px; margin: 10px 0;">Compressor Efficiency Placeholder</div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('.select-selected').click(function() {
+            $('.select-items').toggle();
+        });
+
+        $('.select-items div').click(function() {
+            var selectedValue = $(this).data('value');
+            var selectedText = $(this).text();
+            $('.select-selected').text(selectedText);
+            $('#device-dropdown').val(selectedValue);
+            $('#graphs-container').show(); // Show the graph container when a device is selected
+            $('#selected-device-title').text('Graphs for ' + selectedText); // Update the title with the selected device name
+            $('.select-items').hide();
+        });
+
+        $(document).click(function(e) {
+            if (!$(e.target).closest('.custom-dropdown').length) {
+                $('.select-items').hide();
+            }
+        });
+
+        $('#device-dropdown').change(function() {
+            var selectedDeviceId = $(this).val();
+            var selectedDeviceName = $(this).find('option:selected').text(); // Get the selected device name
+
+            if (selectedDeviceId) {
+                $('#selected-device-title').text('Graphs for ' + selectedDeviceName); // Update the title with the selected device name
+                $('#graphs-container').show(); // Show the graph container when a device is selected
+            } else {
+                $('#graphs-container').hide(); // Hide when no device is selected
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

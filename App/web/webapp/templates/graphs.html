@@ -8,24 +8,26 @@
     <link rel="stylesheet" href="{% static 'css/StyleSheet.css' %}">
 </head>
 <body>
-    <header class="main-header">
-        <h1>Temperature Monitoring System</h1>
-    </header>
+<header class="main-header">
+    <h1>Temperature Monitoring System</h1>
+</header>
 
-    <nav>
-        <ul class="navbar">
-            <li><a href="{% url 'plot_general' %}">Show Graph</a></li>
-            <li><a href="{% url 'device_thresholds' %}">Set Thresholds</a></li>
-        </ul>
-    </nav>
+<nav>
+    <ul class="navbar">
+        <li><a href="{% url 'plot_general' %}">Show Graph</a></li>
+        <li><a href="{% url 'device_thresholds' %}">Set Thresholds</a></li>
+        <!-- added link for DeviceGraph page -->
+        <li><a href="{% url 'device_options' %}">Device Graphs</a></li>
+    </ul>
+</nav>
 
-    <div class="container">
-        <h1 class="title">Temperature Analysis Graphs</h1>
+<div class="container">
+    <h1 class="title">Temperature Analysis Graphs</h1>
 
-        <div class="graph-section">
-            <h2>General Temperature Plot</h2>
-            <img src="{% url 'plot_general' %}" alt="General Temperature Plot" class="graph-img">
-        </div>
+    <div class="graph-section">
+        <h2>General Temperature Plot</h2>
+        <img src="{% url 'plot_general' %}" alt="General Temperature Plot" class="graph-img">
     </div>
+</div>
 </body>
 </html>
