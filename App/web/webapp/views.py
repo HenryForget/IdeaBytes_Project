@@ -49,6 +49,23 @@ import configparser
 
 #     return devices
 
+def get_device_options():
+    # Simulated device names (this will be replaced with JSON file reading later)
+    devices = [
+        {"id": 1, "name": "Cold Room"},
+        {"id": 2, "name": "Freezer"},
+        {"id": 3, "name": "Freezer Room"},
+        {"id": 4, "name": "Kitchen Chiller"},
+    ]
+
+    # Future implementation for reading from JSON:
+    # json_path = 'path_to_your_json_file'
+    # with open(json_path, 'r') as file:
+    #     devices = json.load(file)
+
+    return devices
+
+
 def device_thresholds(request):
     # devices = read_devices_from_csv()
     devices = ['device_1', 'device_2']
@@ -56,3 +73,7 @@ def device_thresholds(request):
         'devices': devices
     }
     return render(request, 'threshold.html', context)
+
+def device_Options(request):
+    devices = get_device_options()  # Call the same function for device options
+    return render(request, 'DeviceGraph.html', {'devices': devices})  # This will stay the same
