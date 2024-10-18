@@ -1,3 +1,4 @@
+
 To build the containers:
 1. pull the branch
 2. cd to App folder. Make sure docker-compose.yml file is in the folder you are in.
@@ -5,7 +6,7 @@ To build the containers:
 
 Docker will build images and create running containers. 
 
-Next, you will need to create tables and add data to them. Steps to do that are in data-init folder.
+Next, you will need to create tables and add data to them. Steps to do that are in init-data folder.
 
 Once the database is populated, you can check how endpoints are responding.
 
