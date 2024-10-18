@@ -1,6 +1,6 @@
 import sys
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi import FastAPI
 sys.path.append('/app')
 import requests as req
@@ -86,7 +86,9 @@ async def get_comp_eff(device):
 
 @app.get("/predict")
 async def get_predict(device, period: int=1):
-    '''Runs the trained model with the real-time data and returns '''
+    '''Runs the trained model with the real-time data.
+       Returns a tuple with real-time data and predicted data
+    '''
     real_data = DataPreparation(configpath='/app/temp.conf')
     json_data = get_data(device)
     real_data.read_json_data(json_data)
@@ -94,20 +96,17 @@ async def get_predict(device, period: int=1):
     model = devices.get(device)[0]
     model_trained = devices.get(device)[1]
     predict = model.predict(real_data.data, model_trained, period)
-    return predict
+    return (real_data.data, predict)
 
 def get_data(device_table):
     '''Queries database and returns data in json string'''
-    # TODO: 1. get the today date, only date, no hours/minutes needed
-    # today = GET TODAY DATE 
-    # query_date = today minus one day or whatever days we decide
-    #  
-    # We'll be querying the database with "like" operator
-    # /device_1?time_data=like.15-05-2024%
-    # 15-05-2024 is the query_date variable => the uri will
-    # look like this:
-    # uri = f"http://app-server-1:3000/{device_table}/time_data=like.{query_date}%"
-    uri = f"http://app-server-1:3000/{device_table}"
+    # TODO: check if the below logic works ok with db.
+    # Dates are tested - they are returned in the proper format
+    # REST call was not tested yet -> need to upload csv files with "future" data first
+    today = datetime.today().date()
+    query_date = (today - timedelta(days=1)).strftime("%d-%m-%Y")
+    today = today.strftime("%d-%m-%Y")
+    uri = f"http://app-server-1:3000/{device_table}?and=(time_data.like.{query_date}%,time_data.like.{today}%)"
     data_req = req.get(url=uri, timeout=30, verify=False)
     if data_req.status_code != 200:
         # TODO deal with None in response in respective methods
