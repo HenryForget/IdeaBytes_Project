@@ -1,5 +1,6 @@
 import sys
 import json
+from datetime import datetime
 from fastapi import FastAPI
 sys.path.append('/app')
 import requests as req
@@ -24,31 +25,47 @@ from models import TsForecasting
 # could be in a config file, python fileor json file.
 
 app = FastAPI()
-# prepare data
-temp_data = DataPreparation(configpath='/app/temp.conf')
-temp_data.read_csv_data(datapath='/app/ColdRoom_DataLogger_month.csv')
-temp_data.prepare_data()
-# prepare data for compresor efficiency plot
-# prepare peaks and valleys from temperature data
-peaks, valleys = temp_data.get_peaks_valleys_status()
-# get time differentials
-time_diffs = temp_data.get_time_diffs(peaks,valleys)
-# get temperature differentials
-temp_diffs = temp_data.get_temp_diffs(peaks, valleys)
-# Get Degrees of Cooling/Hour
-deg_per_hour = temp_data.get_degrees_per_hour(peaks, temp_diffs, time_diffs)
+# read devices list and get their ids to query SQL table - each device id is a table name in Postgres database
 
+def prepare_data(device):
+    '''Prepares initial data for each device'''
+    # prepare data
+    temp_data = DataPreparation(configpath='/app/temp.conf')
+    temp_data.read_csv_data(datapath=f'/app/{device}.csv')
+    temp_data.prepare_data()
+    # prepare data for compressor efficiency plot
+    # prepare peaks and valleys from temperature data
+    peaks, valleys = temp_data.get_peaks_valleys_status()
+    # get time differentials
+    time_diffs = temp_data.get_time_diffs(peaks,valleys)
+    # get temperature differentials
+    temp_diffs = temp_data.get_temp_diffs(peaks, valleys)
+    # Get Degrees of Cooling/Hour
+    deg_per_hour = temp_data.get_degrees_per_hour(peaks, temp_diffs, time_diffs)
+    return (temp_data, deg_per_hour)
 
-# prepare model for temperature forecasting
-model = TsForecasting(dataset = temp_data.data)
-model_trained = model.run_sarimax()
-# prepare initial compressor efficiency
-model.compr_model = model.predict_slope(deg_per_hour)
+def prepare_model(temp_data, deg_per_hour):
+    '''Train model'''
+    # prepare model for temperature forecasting
+    model = TsForecasting(dataset = temp_data.data)
+    model_trained = model.run_sarimax()
+    # prepare initial compressor efficiency
+    model.compr_model = model.predict_slope(deg_per_hour)
+    return (model, model_trained)
 
 # TODO We need to post the initial compressor efficiency to GUI endpoint to create a graph. 
-# this will be done just once upon app lunch. 
+# this will be done just once upon app launch.
 # later on the call from GUI will get results from "real" data,
 # add it to the initial one and will update the compressor efficiency graph
+
+with open("/app/devices.json", 'r', encoding = 'utf-8') as file:
+    devices_json = json.load(file)
+devices = {}
+for item in devices_json:
+    data, degrees = prepare_data(item["id"])
+    dev_obj, device_model = prepare_model(data, degrees)
+    devices.update({item["id"]:[dev_obj, device_model, degrees]})
+
 
 @app.get("/comp_eff")
 async def get_comp_eff(device):
@@ -61,6 +78,8 @@ async def get_comp_eff(device):
     rtime_diffs = real_data.get_time_diffs(rpeaks,rvalleys)
     rtemp_diffs = real_data.get_temp_diffs(rpeaks, rvalleys)
     rdeg_per_hour = real_data.get_degrees_per_hour(rpeaks, rtemp_diffs, rtime_diffs)
+    model = devices.get(device)[0]
+    deg_per_hour = devices.get(device)[2]
     updated_degrees = model.add_data(deg_per_hour, rdeg_per_hour)
     compr_updated = model.predict_slope(updated_degrees)
     return compr_updated
@@ -72,12 +91,22 @@ async def get_predict(device, period: int=1):
     json_data = get_data(device)
     real_data.read_json_data(json_data)
     real_data.prepare_data()
+    model = devices.get(device)[0]
+    model_trained = devices.get(device)[1]
     predict = model.predict(real_data.data, model_trained, period)
     return predict
 
 def get_data(device_table):
-    # TODO: addperiod depth in query - 1 day back from the call perhaps?
-    '''Queries database and returns data in json string'''    
+    '''Queries database and returns data in json string'''
+    # TODO: 1. get the today date, only date, no hours/minutes needed
+    # today = GET TODAY DATE 
+    # query_date = today minus one day or whatever days we decide
+    #  
+    # We'll be querying the database with "like" operator
+    # /device_1?time_data=like.15-05-2024%
+    # 15-05-2024 is the query_date variable => the uri will
+    # look like this:
+    # uri = f"http://app-server-1:3000/{device_table}/time_data=like.{query_date}%"
     uri = f"http://app-server-1:3000/{device_table}"
     data_req = req.get(url=uri, timeout=30, verify=False)
     if data_req.status_code != 200:
